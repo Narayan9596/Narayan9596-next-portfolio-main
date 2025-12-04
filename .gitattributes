@@ -1,0 +1,5 @@
+﻿# keep JSON files with LF line endings (no CRLF)
+*.json text eol=lf
+
+# normalize other text files automatically
+* text=auto
