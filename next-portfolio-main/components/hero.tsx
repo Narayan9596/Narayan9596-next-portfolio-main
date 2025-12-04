@@ -33,7 +33,7 @@ export const Hero = () => {
 
           <TextGenerateEffect
             className="text-center text-[40px] md:text-5xl lg:text-6xl"
-            words="welcome to narayan sharma portfolio"
+            words="Welcome to Narayan Sharma Portfolio"
           />
 
           <p className="mb-4 text-center text-sm md:text-lg md:tracking-wider lg:text-2xl">

@@ -1,19 +1,13 @@
 "use client";
-import { useThree, Object3DNode, Canvas, extend } from "@react-three/fiber";
+import { useThree, Canvas } from "@react-three/fiber";
 import { OrbitControls } from "@react-three/drei";
 import { useEffect, useRef, useState } from "react";
 import { Color, Scene, Fog, PerspectiveCamera, Vector3 } from "three";
-import ThreeGlobe from "three-globe";
+
 
 import countries from "@/data/globe.json";
 
-declare module "@react-three/fiber" {
-  interface ThreeElements {
-    threeGlobe: Object3DNode<ThreeGlobe, typeof ThreeGlobe>;
-  }
-}
 
-extend({ ThreeGlobe });
 
 const RING_PROPAGATION_SPEED = 3;
 const aspect = 1.2;
@@ -65,16 +59,26 @@ let numbersOfRings = [0];
 export const Globe = ({ globeConfig, data }: WorldProps) => {
   const [globeData, setGlobeData] = useState<
     | {
-        size: number;
-        order: number;
-        color: (t: number) => string;
-        lat: number;
-        lng: number;
-      }[]
+      size: number;
+      order: number;
+      color: (t: number) => string;
+      lat: number;
+      lng: number;
+    }[]
     | null
   >(null);
 
-  const globeRef = useRef<ThreeGlobe | null>(null);
+  const globeRef = useRef<any>(null);
+  const [mounted, setMounted] = useState(false);
+
+  useEffect(() => {
+    if (typeof window !== "undefined") {
+      import("three-globe").then(({ default: ThreeGlobe }) => {
+        globeRef.current = new ThreeGlobe();
+        setMounted(true);
+      });
+    }
+  }, []);
 
   const defaultProps = {
     pointSize: 1,
@@ -177,10 +181,8 @@ export const Globe = ({ globeConfig, data }: WorldProps) => {
       .arcStartLng((d) => (d as { startLng: number }).startLng * 1)
       .arcEndLat((d) => (d as { endLat: number }).endLat * 1)
       .arcEndLng((d) => (d as { endLng: number }).endLng * 1)
-      .arcColor((e: any) => (e as { color: string }).color)
-      .arcAltitude((e) => {
-        return (e as { arcAlt: number }).arcAlt * 1;
-      })
+      .arcColor((e: { color: string }) => e.color)
+      .arcAltitude((e: { arcAlt: number }) => e.arcAlt * 1)
       .arcStroke((e) => {
         return [0.32, 0.28, 0.3][Math.round(Math.random() * 2)];
       })
@@ -229,7 +231,7 @@ export const Globe = ({ globeConfig, data }: WorldProps) => {
 
   return (
     <>
-      <threeGlobe ref={globeRef} />
+      {mounted && <primitive object={globeRef.current} />}
     </>
   );
 };
@@ -291,10 +293,10 @@ export const hexToRgb = (hex: string) => {
   var result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
   return result
     ? {
-        r: parseInt(result[1], 16),
-        g: parseInt(result[2], 16),
-        b: parseInt(result[3], 16),
-      }
+      r: parseInt(result[1], 16),
+      g: parseInt(result[2], 16),
+      b: parseInt(result[3], 16),
+    }
     : null;
 };
 

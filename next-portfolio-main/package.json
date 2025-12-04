@@ -5,7 +5,9 @@
   "scripts": {
     "dev": "next dev",
     "build": "next build",
-    "start": "next start"
+    "start": "next start",
+    "lint": "next lint",
+    "preview": "next build && next start"
   },
   "author": {
     "name": "Narayan Sharma",
